@@ -1,6 +1,7 @@
 """
 Main controller classes
 """
+import threading
 from time import sleep
 import os
 from threading import Timer
@@ -44,9 +45,12 @@ class StepperClass:
         GPIO.setup([a, aa, b, bb], GPIO.OUT)
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
+        readerthread = threading.Timer(1,self.readswitches)
+        readerthread.name = '%s switches reader' %direction
+        readerthread.start()
 
 
-    def readswwitches(self):
+    def readswitches(self):
         """Read the switch values"""
         while True:
             self.maxswitch = GPIO.input(self.channelupperlimit)
