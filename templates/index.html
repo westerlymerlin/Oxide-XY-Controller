@@ -4,15 +4,30 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="30" >
-<title>London Geochronology Centre - Oxide Line - X-Y Controller</title>
+<title>London Geochronology Centre - {{appname}}</title>
 <link href="{{ url_for('static',filename='css/text.css') }}" rel="stylesheet" type="text/css">
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <script>
+
+setInterval(getstatusdata, 1000);
+
+async function getstatusdata() {
+  const response = await fetch("/statusdata");
+  const statusdata = await response.json();
+  var idtoupdate = document.getElementById('123-cpu');
+  idtoupdate.innerHTML = statusdata.cputemperature;
+  var idtoupdate = document.getElementById('123-xpos');
+  idtoupdate.innerHTML = statusdata.xpos;
+  var idtoupdate = document.getElementById('123-ypos');
+  idtoupdate.innerHTML = statusdata.ypos;
+}
+
+</script>
 </head>
-<body>
+<body onload="getstatusdata()">
 	  <section class="banner">
 		  <div >
-               <P class="logo">London Geochronology Centre - X-Y Controller Server Status &nbsp CPU {{cputemperature}}&deg;C</P>
+              <P class="logo">London Geochronology Centre - {{appname}} - Server Status &nbsp CPU <strong id="123-cpu">awaiting-data</strong>&deg;C</P>
               <p class="breadcrumbtext"><a href = "/" class="breadcrumblink">Return to index</a> &nbsp|&nbsp
               <a href = "/pylog" class="breadcrumblink">Application Log</a> &nbsp|&nbsp
               <a href = "/guaccesslog" class="breadcrumblink">Website Access Log</a> &nbsp|&nbsp
@@ -21,32 +36,28 @@
           </div>
   </section>
 <section class="container2">
-    <p class="sectiontext"> Positions</p>
-        <table border = 1px cellspacing = 0>
-         <thead>
-         <td class="tabledataleft"><B>Motor</B></td>
-            <td class="tabledataleft"><B>ADC position (-2.5 to +2.5)</B></td>
-         </thead>
+    <p class="sectiontext"> X-Y Stage Status</p>
+      <table>
             <tr>
-                    <td class="tabledataleft">X Stepper</td>
-                    <td class="tabledataleft">{{locations['xpos']}}</td>
+                    <td class="tabledataleft">X Position</td>
+                    <td class="tabledataleft" id="123-xpos">awaiting-data</td>
             </tr>
             <tr>
-                    <td class="tabledataleft">Y Stepper</td>
-                    <td class="tabledataleft">{{locations['ypos']}}</td>
+                    <td class="tabledataleft">Y Position</td>
+                    <td class="tabledataleft" id="123-ypos">awaiting-data</td>
             </tr>
-            {% for thread in threads %}
-                <tr>
+         {% for thread in threads %}
+             <tr>
                     <td class="tabledataleft">{{thread[0]}}</td>
                     <td class="tabledataleft">{{thread[1]}}</td>
 
                 </tr>
-            {% endfor %}
+         {% endfor %}
       </table>
     <p>&nbsp</p>
-	</section>
+ 	</section>
   <section class="banner">
-       <div class ="copyright"><strong>Software Version</strong> {{version}}<br>&copy;2025 - <strong>London Geochronology Centre</strong></div>
+ <div class ="copyright"><strong>Software Version</strong> {{version}}<br>&copy;2025 - <strong>London Geochronology Centre</strong></div>
 	  </section>
 </body>
 </html>
