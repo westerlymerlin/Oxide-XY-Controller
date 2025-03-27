@@ -20,6 +20,14 @@ async function getstatusdata() {
   idtoupdate.innerHTML = statusdata.xpos;
   var idtoupdate = document.getElementById('123-ypos');
   idtoupdate.innerHTML = statusdata.ypos;
+  var idtoupdate = document.getElementById('123-xminlimswitch');
+  idtoupdate.innerHTML = statusdata.xminswitch;
+  var idtoupdate = document.getElementById('123-xmaxlimswitch');
+  idtoupdate.innerHTML = statusdata.xmaxswitch;
+  var idtoupdate = document.getElementById('123-yminlimswitch');
+  idtoupdate.innerHTML = statusdata.yminswitch;
+  var idtoupdate = document.getElementById('123-ymaxlimswitch');
+  idtoupdate.innerHTML = statusdata.xmaxswitch;
 }
 
 </script>
@@ -46,6 +54,23 @@ async function getstatusdata() {
                     <td class="tabledataleft">Y Position</td>
                     <td class="tabledataleft" id="123-ypos">awaiting-data</td>
             </tr>
+            <tr>
+                    <td class="tabledataleft">X minimum limit switch</td>
+                    <td class="tabledataleft" id="123-xminlimswitch">awaiting-data</td>
+            </tr>
+            <tr>
+                    <td class="tabledataleft">X maximum limit switch</td>
+                    <td class="tabledataleft" id="123-xmaxlimswitch">awaiting-data</td>
+            </tr>
+            <tr>
+                    <td class="tabledataleft">Y minimum limit switch</td>
+                    <td class="tabledataleft" id="123-yminlimswitch">awaiting-data</td>
+            </tr>
+            <tr>
+                    <td class="tabledataleft">Y maximum limit switch</td>
+                    <td class="tabledataleft" id="123-ymaxlimswitch">awaiting-data</td>
+            </tr>
+
          {% for thread in threads %}
              <tr>
                     <td class="tabledataleft">{{thread[0]}}</td>

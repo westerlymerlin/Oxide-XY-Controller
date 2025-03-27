@@ -35,6 +35,8 @@ class StepperClass:
         self.position = settings[self.positionsetting]
         self.upperlimit = settings[self.upperlimitsetting]
         self.lowerlimit = settings[self.lowerlimitsetting]
+        self.maxswitch = 0
+        self.minswitch = 0
         self.sequence = 0
         self.pulsewidth = 0.025
         self.moving = False
@@ -43,6 +45,13 @@ class StepperClass:
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
 
+
+    def readswwitches(self):
+        """Read the switch values"""
+        while True:
+            self.maxswitch = GPIO.input(self.channelupperlimit)
+            self.minswitch = GPIO.input(self.channellowerlimit)
+            sleep(0.5)
 
 
     def current(self):
@@ -168,12 +177,15 @@ class StepperClass:
 
 def statusmessage():
     """Return the psotion status to the web page"""
-    statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position})
+    statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position, 'xminswitch': stepperx.minswitch,
+                   'xmaxswitch': stepperx.maxswitch, 'yminswitch': steppery.minswitch,
+                   'ymaxswitch': steppery.maxswitch})
     return statuslist
 
 def apistatus():
     """Return the ststus as a json message for the api"""
-    statuslist = ({'xpos': stepperx.position, 'xmoving': stepperx.moving, 'ypos': steppery.position, 'ymoving': steppery.moving })
+    statuslist = ({'xpos': stepperx.position, 'xmoving': stepperx.moving, 'ypos': steppery.position,
+                   'ymoving': steppery.moving })
     return statuslist
 
 def parsecontrol(item, command):
