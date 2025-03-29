@@ -20,21 +20,21 @@ def initialise():
                  'xposition': 100,
                  'x-max': 190,
                  'x-min': 10,
-                 'x-a-gpio-pin': 21,
-                 'x-aa-gpio-pin': 26,
-                 'x-b-gpio-pin': 20,
-                 'x-bb-gpio-pin': 19,
+                 'y-a-gpio-pin': 21,
+                 'y-aa-gpio-pin': 26,
+                 'y-b-gpio-pin': 20,
+                 'y-bb-gpio-pin': 19,
                  'x-min-gpio-pin': 17,
                  'x-max-gpio-pin': 18,
                  'yposition': 100,
                  'y-max': 190,
                  'y-min': 10,
-                 'y-a-gpio-pin': 16,
-                 'y-aa-gpio-pin': 13,
-                 'y-b-gpio-pin': 12,
-                 'y-bb-gpio-pin': 6,
+                 'x-a-gpio-pin': 16,
+                 'x-aa-gpio-pin': 13,
+                 'x-b-gpio-pin': 12,
+                 'x-bb-gpio-pin': 6,
                  'y-min-gpio-pin': 23,
-                 'y-max-gpio-pin': 27,
+                 'y-max-gpio-pin': 270,
                  'cputemp': '/sys/class/thermal/thermal_zone0/temp'}
     return isettings
 
@@ -73,7 +73,7 @@ def loadsettings():
             print('settings[%s] Not found in json file using default' % item)
             settingschanged = True
     if settings['api-key'] == 'change-me':
-        settings['api-key'] = generate_api_key(30)
+        settings['api-key'] = generate_api_key(128)
         settingschanged = True
     if settingschanged:
         writesettings()
