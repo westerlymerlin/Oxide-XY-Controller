@@ -173,7 +173,7 @@ class StepperClass:
         self.moving = False
 
     def output(self, channels):
-        """Output the value to teh coils on the stepper"""
+        """Output the value to thE coils on the stepper"""
         GPIO.output(self.channela, channels[0])
         GPIO.output(self.channelaa, channels[1])
         GPIO.output(self.channelb, channels[2])
@@ -213,6 +213,9 @@ def parsecontrol(item, command):
             timerthread = Timer(1, lambda: steppery.moveto(command))
             timerthread.name = 'ymove to %s thread' % command
             timerthread.start()
+        elif item == 'output':
+            stepperx.output(command)
+            steppery.output(command)
         elif item == 'restart':
             if command == 'pi':
                 logger.warning('Restart command recieved: system will restart in 15 seconds')
