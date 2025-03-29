@@ -34,7 +34,7 @@ def initialise():
                  'x-b-gpio-pin': 12,
                  'x-bb-gpio-pin': 6,
                  'y-min-gpio-pin': 23,
-                 'y-max-gpio-pin': 270,
+                 'y-max-gpio-pin': 27,
                  'cputemp': '/sys/class/thermal/thermal_zone0/temp'}
     return isettings
 
