@@ -28,7 +28,7 @@ class StepperClass:
         self.channelb = b
         self.channelbb = bb
         self.sequenceindex = 0
-        self.channelupperlimit = limmin
+        self.channelupperlimit = limmax
         self.channellowerlimit = limmin
         self.positionsetting = '%sposition' % direction
         self.upperlimitsetting = '%s-max' % direction
