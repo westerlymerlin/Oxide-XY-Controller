@@ -186,13 +186,17 @@ class StepperClass:
         self.calibrating = True
         while self.minswitch == 1:
             self.moveprevious()
+            sleep(self.pulsewidth)
         while self.maxswitch == 0:
             self.movenext()
+            sleep(self.pulsewidth)
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
+            sleep(self.pulsewidth)
         while self.maxswitch == 0:
             self.moveprevious()
+            sleep(self.pulsewidth)
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
         writesettings()
