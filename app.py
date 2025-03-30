@@ -4,7 +4,7 @@ This is the main flask application - called by Gunicorn
 import subprocess
 from threading import enumerate as enumerate_threads
 from flask import Flask, render_template, jsonify, request
-from steppercontrol import statusmessage, parsecontrol, apistatus, runselftest
+from steppercontrol import statusmessage, parsecontrol, apistatus
 from app_control import VERSION, settings
 from logmanager import logger
 
@@ -67,13 +67,6 @@ def api():
     except KeyError:
         return "badly formed json message", 401
 
-
-@app.route('/selftest')
-def selftest():
-    """self-test routine that moves the stepper in each direction"""
-    runselftest()
-    return 'Self-Test started, please review logs and front panel to see results' \
-           ' <A href="/pylog">Click here for logs</A>'
 
 
 @app.route('/pylog')

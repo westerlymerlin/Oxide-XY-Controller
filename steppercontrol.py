@@ -217,7 +217,11 @@ def statusmessage():
     """Return the psotion status to the web page"""
     statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position, 'xminswitch': stepperx.minswitch,
                    'xmaxswitch': stepperx.maxswitch, 'yminswitch': steppery.minswitch,
-                   'ymaxswitch': steppery.maxswitch})
+                   'ymaxswitch': steppery.maxswitch, 'stepperx-a': GPIO.input(stepperx.channela),
+                   'stepperx-aa': GPIO.input(stepperx.channelaa), 'stepperx-b': GPIO.input(stepperx.channelb),
+                   'stepperx-bb': GPIO.input(stepperx.channelbb), 'steppery-a': GPIO.input(steppery.channela),
+                   'steppery-aa': GPIO.input(steppery.channelaa), 'stepperx-y': GPIO.input(steppery.channelb),
+                   'steppery-bb': GPIO.input(steppery.channelbb)})
     return statuslist
 
 def apistatus():
@@ -269,57 +273,11 @@ def parsecontrol(item, command):
         logger.error('bad valve number')
 
 
-def runselftest():
-    """Run a selftest defined in the **testsequence** method"""
-    logger.info('Stopping both motors prior to testing')
-    stepperx.stop()
-    steppery.stop()
-    logger.info('Starting test sequence in 10 seconds')
-    timerthread = Timer(10, testsequence)
-    timerthread.name = 'selftest thread'
-    timerthread.start()
-
 def reboot():
     """API call to reboot the Raspberry Pi"""
     logger.warning('System is restarting now')
     os.system('sudo reboot')
 
-def testsequence():
-    """test sequence for the x-y table"""
-    logger.info('Self test started ************************************')
-    logger.info('Starting channel x tests')
-    logger.info('Setting all x channels to 1 for 5 seconds')
-    stepperx.output([1, 1, 1, 1])
-    sleep(5)
-    logger.info('Setting all x channels to 0 for 5 seconds')
-    stepperx.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('step x 10 steps forward')
-    stepperx.moveslow(10)
-    stepperx.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('step x 10 steps backward')
-    stepperx.moveslow(-10)
-    stepperx.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('Finished Channel x tests')
-    logger.info('Starting channel y tests')
-    logger.info('Setting all y channels to 1 for 5 seconds')
-    steppery.output([1, 1, 1, 1])
-    sleep(5)
-    logger.info('Setting all y channels to 0 for 5 seconds')
-    steppery.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('step y 10 steps forward')
-    steppery.moveslow(10)
-    steppery.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('step y 10 steps backward')
-    steppery.moveslow(-10)
-    steppery.output([0, 0, 0, 0])
-    sleep(5)
-    logger.info('Finished Channel y tests')
-    logger.info('Self test ended ************************************')
 
 
 logger.info("xy controller started")
