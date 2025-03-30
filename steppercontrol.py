@@ -189,7 +189,7 @@ class StepperClass:
             self.moveprevious()
             sleep(self.pulsewidth)
         logger.info('Min limit switch found')
-        while self.maxswitch == 0:
+        while self.minswitch == 0:
             self.movenext()
             sleep(self.pulsewidth)
         logger.info('Min limit reset, setting zero')
@@ -197,17 +197,18 @@ class StepperClass:
         while self.maxswitch == 1:
             self.movenext()
             sleep(self.pulsewidth)
-        logger.info('Max limit switch found')
+        logger.info('Max limit switch found at %s', self.position)
         while self.maxswitch == 0:
             self.moveprevious()
             sleep(self.pulsewidth)
         logger.info('Max limit reset, setting max limit')
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
-        writesettings()
+        self.updateposition()
         self.calibrating = False
-        logger.info('Calibrating %s complete moving to centre', self.axis)
-        self.moveto(int(self.upperlimit-self.lowerlimit))
+        centre = int(self.upperlimit + self.lowerlimit) / 2
+        logger.info('Calibrating %s complete moving to centre %s', self.axis, centre)
+        self.moveto(centre)
 
 def statusmessage():
     """Return the psotion status to the web page"""
