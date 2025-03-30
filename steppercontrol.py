@@ -123,7 +123,7 @@ class StepperClass:
 
 
     def moveslow(self, steps):
-        """Moce **steps** slowly"""
+        """Move **steps** slowly"""
         self.sequence = self.sequence + 1
         self.moving = True
         while steps != 0 and self.moving:
@@ -184,23 +184,29 @@ class StepperClass:
     def calibrate(self):
         """Run a calibration routine to find the man and max limit switches and reset the position of the stage"""
         self.calibrating = True
+        logger.info('Starting Calibrating %s', self.axis)
         while self.minswitch == 1:
             self.moveprevious()
             sleep(self.pulsewidth)
+        logger.info('Min limit switch found')
         while self.maxswitch == 0:
             self.movenext()
             sleep(self.pulsewidth)
+        logger.info('Min limit reset, setting zero')
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
             sleep(self.pulsewidth)
+        logger.info('Max limit switch found')
         while self.maxswitch == 0:
             self.moveprevious()
             sleep(self.pulsewidth)
+        logger.info('Max limit reset, setting max limit')
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
         writesettings()
         self.calibrating = False
+        logger.info('Calibrating %s complete moving to centre', self.axis)
         self.moveto(int(self.upperlimit-self.lowerlimit))
 
 def statusmessage():
