@@ -55,6 +55,10 @@ class StepperClass:
         while True:
             self.maxswitch = GPIO.input(self.channelupperlimit)
             self.minswitch = GPIO.input(self.channellowerlimit)
+            if self.minswitch == 0:
+                logger.info('Min limit switch %s found', self.axis)
+            if self.maxswitch == 0:
+                logger.info('Max limit switch %s found', self.axis)
             sleep(0.5)
 
 
@@ -187,7 +191,7 @@ class StepperClass:
         logger.info('Starting Calibrating %s', self.axis)
         while self.minswitch == 1:
             self.moveprevious()
-            sleep(self.pulsewidth * 2)
+            #  sleep(self.pulsewidth * 2)
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
@@ -196,12 +200,11 @@ class StepperClass:
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
-            sleep(self.pulsewidth * 2)
-        logger.info('Max limit switch found at %s', self.position)
+            # sleep(self.pulsewidth * 2)
         while self.maxswitch == 0:
             self.moveprevious()
             sleep(self.pulsewidth * 2)
-        logger.info('Max limit reset, setting max limit')
+        logger.info('Max limit set to %s', self.position -10)
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
         self.updateposition()
