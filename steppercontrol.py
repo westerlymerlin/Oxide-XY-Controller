@@ -217,11 +217,11 @@ def statusmessage():
     """Return the psotion status to the web page"""
     statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position, 'xminswitch': stepperx.minswitch,
                    'xmaxswitch': stepperx.maxswitch, 'yminswitch': steppery.minswitch,
-                   'ymaxswitch': steppery.maxswitch, 'stepperx-a': GPIO.input(stepperx.channela),
-                   'stepperx-aa': GPIO.input(stepperx.channelaa), 'stepperx-b': GPIO.input(stepperx.channelb),
-                   'stepperx-bb': GPIO.input(stepperx.channelbb), 'steppery-a': GPIO.input(steppery.channela),
-                   'steppery-aa': GPIO.input(steppery.channelaa), 'stepperx-y': GPIO.input(steppery.channelb),
-                   'steppery-bb': GPIO.input(steppery.channelbb)})
+                   'ymaxswitch': steppery.maxswitch, 'stepperxa': GPIO.input(stepperx.channela),
+                   'stepperxaa': GPIO.input(stepperx.channelaa), 'stepperxb': GPIO.input(stepperx.channelb),
+                   'stepperxbb': GPIO.input(stepperx.channelbb), 'stepperya': GPIO.input(steppery.channela),
+                   'stepperyaa': GPIO.input(steppery.channelaa), 'stepperyb': GPIO.input(steppery.channelb),
+                   'stepperybb': GPIO.input(steppery.channelbb)})
     return statuslist
 
 def apistatus():

@@ -29,14 +29,21 @@ async function getstatusdata() {
   var idtoupdate = document.getElementById('123-ymaxlimswitch');
   idtoupdate.innerHTML = statusdata.ymaxswitch;
   var idtoupdate = document.getElementById('123-stepperx-a');
-  idtoupdate.innerHTML = statusdata.stepperx-a;
+  idtoupdate.innerHTML = statusdata.stepperxa;
   var idtoupdate = document.getElementById('123-stepperx-aa');
-  idtoupdate.innerHTML = statusdata.stepperx-aa;
+  idtoupdate.innerHTML = statusdata.stepperxaa;
   var idtoupdate = document.getElementById('123-stepperx-b');
-  idtoupdate.innerHTML = statusdata.stepperx-b;
+  idtoupdate.innerHTML = statusdata.stepperxb;
   var idtoupdate = document.getElementById('123-stepperx-bb');
-  idtoupdate.innerHTML = statusdata.stepperx-bb;
-
+  idtoupdate.innerHTML = statusdata.stepperxbb;
+  var idtoupdate = document.getElementById('123-steppery-a');
+  idtoupdate.innerHTML = statusdata.stepperya;
+  var idtoupdate = document.getElementById('123-steppery-aa');
+  idtoupdate.innerHTML = statusdata.stepperyaa;
+  var idtoupdate = document.getElementById('123-steppery-b');
+  idtoupdate.innerHTML = statusdata.stepperyb;
+  var idtoupdate = document.getElementById('123-steppery-bb');
+  idtoupdate.innerHTML = statusdata.stepperybb;
 }
 
 </script>
@@ -93,6 +100,7 @@ async function getstatusdata() {
             <td class="tabledataleft" colspan="4">Stepper X</td>
             <td class="tabledataleft" colspan="4">Stepper Y</td>
         </tr>
+        <p>&nbsp</p>
         <tr>
             <td class="tabledataleft" id="123-stepperx-a">awaiting-data</td>
             <td class="tabledataleft" id="123-stepperx-aa">awaiting-data</td>
