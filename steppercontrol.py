@@ -187,20 +187,20 @@ class StepperClass:
         logger.info('Starting Calibrating %s', self.axis)
         while self.minswitch == 1:
             self.moveprevious()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 2)
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 2)
         logger.info('Min limit reset, setting zero')
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 2)
         logger.info('Max limit switch found at %s', self.position)
         while self.maxswitch == 0:
             self.moveprevious()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 2)
         logger.info('Max limit reset, setting max limit')
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
