@@ -65,30 +65,32 @@ class StepperClass:
     def movenext(self, fine=False):
         """Move +1 step"""
         stepincrement = 1
-        if self.position < self.upperlimit:
-            self.sequenceindex += stepincrement
-            if self.sequenceindex > 7:
-                self.sequenceindex = 0
-            self.output(self.seq[self.sequenceindex])
-            self.position += stepincrement
-            sleep(self.pulsewidth)
-            if not fine:
-                self.output([0, 0, 0, 0])
-            # print('Move %s' % stepincrement)
+        if (self.position < self.upperlimit) or self.calibrating:
+            if self.maxswitch == 1 or self.calibrating:
+                self.sequenceindex += stepincrement
+                if self.sequenceindex > 7:
+                    self.sequenceindex = 0
+                self.output(self.seq[self.sequenceindex])
+                self.position += stepincrement
+                sleep(self.pulsewidth)
+                if not fine:
+                    self.output([0, 0, 0, 0])
+                # print('Move %s' % stepincrement)
 
     def moveprevious(self, fine=False):
         """Move -1 step"""
         stepincrement = -1
-        if self.position > self.lowerlimit:
-            self.sequenceindex += stepincrement
-            if self.sequenceindex < 0:
-                self.sequenceindex = 7
-            self.output(self.seq[self.sequenceindex])
-            self.position += stepincrement
-            sleep(self.pulsewidth)
-            if not fine:
-                self.output([0, 0, 0, 0])
-            # print('Move %s' % stepincrement)
+        if (self.position > self.lowerlimit) or self.calibrating:
+            if self.minswitch == 1 or self.calibrating:
+                self.sequenceindex += stepincrement
+                if self.sequenceindex < 0:
+                    self.sequenceindex = 7
+                self.output(self.seq[self.sequenceindex])
+                self.position += stepincrement
+                sleep(self.pulsewidth)
+                if not fine:
+                    self.output([0, 0, 0, 0])
+                # print('Move %s' % stepincrement)
 
     def updateposition(self):
         """write the position to the settings file"""
@@ -179,6 +181,24 @@ class StepperClass:
         GPIO.output(self.channelb, channels[2])
         GPIO.output(self.channelbb, channels[3])
 
+    def calibrate(self):
+        """Run a calibration routine to find the man and max limit switches and reset the position of the stage"""
+        self.calibrating = True
+        while self.minswitch == 1:
+            self.moveprevious()
+        while self.maxswitch == 0:
+            self.movenext()
+        self.position = 0
+        while self.maxswitch == 1:
+            self.movenext()
+        while self.maxswitch == 0:
+            self.moveprevious()
+        self.upperlimit = self.position - 10
+        settings[self.upperlimitsetting] = self.upperlimit
+        writesettings()
+        self.calibrating = False
+        self.moveto(int(self.upperlimit-self.lowerlimit))
+
 def statusmessage():
     """Return the psotion status to the web page"""
     statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position, 'xminswitch': stepperx.minswitch,
@@ -198,20 +218,28 @@ def parsecontrol(item, command):
         if item != 'getxystatus':
             logger.info('%s : %s ', item, command)
         if item == 'xmove':
-            timerthread = Timer(1, lambda: stepperx.move(command))
+            timerthread = Timer(0.1, lambda: stepperx.move(command))
             timerthread.name = 'xmove thread'
             timerthread.start()
         elif item == 'ymove':
-            timerthread = Timer(1, lambda: steppery.move(command))
+            timerthread = Timer(0.1, lambda: steppery.move(command))
             timerthread.name = 'ymove thread'
             timerthread.start()
         elif item == 'xmoveto':
-            timerthread = Timer(1, lambda: stepperx.moveto(command))
-            timerthread.name = 'ymove to %s thread' % command
+            timerthread = Timer(0.1, lambda: stepperx.moveto(command))
+            timerthread.name = 'xmove to %s thread' % command
             timerthread.start()
         elif item == 'ymoveto':
-            timerthread = Timer(1, lambda: steppery.moveto(command))
+            timerthread = Timer(0.1, lambda: steppery.moveto(command))
             timerthread.name = 'ymove to %s thread' % command
+            timerthread.start()
+        elif item == 'xcalibrate':
+            timerthread = Timer(0.1, stepperx.calibrate)
+            timerthread.name = 'x calibrating thread'
+            timerthread.start()
+        elif item == 'ycalibrate':
+            timerthread = Timer(0.1, steppery.calibrate)
+            timerthread.name = 'y calibrating thread'
             timerthread.start()
         elif item == 'output':
             stepperx.output(command)
@@ -221,7 +249,6 @@ def parsecontrol(item, command):
                 logger.warning('Restart command recieved: system will restart in 15 seconds')
                 timerthread = Timer(15, reboot)
                 timerthread.start()
-        # print('X = %s, Y = %s' % (stepperx.listlocation(), steppery.listlocation()))
     except ValueError:
         logger.error('incorrect json message')
     except IndexError:
