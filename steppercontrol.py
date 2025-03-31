@@ -167,6 +167,7 @@ class StepperClass:
                 if difference < 10:
                     sleep(self.pulsewidth * 10)
         logger.info('%s Move to %s complete, position = %s', self.axis, target, self.position)
+        self.stop()
         self.moving = False
 
     def output(self, channels):
@@ -222,6 +223,15 @@ def apistatus():
                    'ymoving': steppery.moving })
     return statuslist
 
+
+def updatesetting(newsetting): # must be a dict object
+    """Update the settings with the new values"""
+    if isinstance(newsetting, dict):
+        for item in newsetting.keys():
+            settings[item] = newsetting[item]
+        writesettings()
+
+
 def parsecontrol(item, command):
     """Parser that recieves messages from the API or web page posts and directs messages to the correct function"""
     try:
@@ -231,38 +241,55 @@ def parsecontrol(item, command):
             timerthread = Timer(0.1, lambda: stepperx.move(command))
             timerthread.name = 'xmove thread'
             timerthread.start()
-        elif item == 'ymove':
+            return apistatus()
+        if item == 'ymove':
             timerthread = Timer(0.1, lambda: steppery.move(command))
             timerthread.name = 'ymove thread'
             timerthread.start()
-        elif item == 'xmoveto':
+            return apistatus()
+        if item == 'xmoveto':
             timerthread = Timer(0.1, lambda: stepperx.moveto(command))
             timerthread.name = 'xmove to %s thread' % command
             timerthread.start()
-        elif item == 'ymoveto':
+            return apistatus()
+        if item == 'ymoveto':
             timerthread = Timer(0.1, lambda: steppery.moveto(command))
             timerthread.name = 'ymove to %s thread' % command
             timerthread.start()
-        elif item == 'xcalibrate':
+            return apistatus()
+        if item == 'xcalibrate':
             timerthread = Timer(0.1, stepperx.calibrate)
             timerthread.name = 'x calibrating thread'
             timerthread.start()
-        elif item == 'ycalibrate':
+            return apistatus()
+        if item == 'ycalibrate':
             timerthread = Timer(0.1, steppery.calibrate)
             timerthread.name = 'y calibrating thread'
             timerthread.start()
-        elif item == 'output':
+            return apistatus()
+        if item == 'output':
             stepperx.output(command)
             steppery.output(command)
-        elif item == 'restart':
+            return apistatus()
+        if item == 'updatesetting':
+            logger.warning('parsecontrol Setting changed via api - %s', command)
+            updatesetting(command)
+            return settings
+        if item == 'getsettings':
+            return settings
+        if item == 'restart':
             if command == 'pi':
                 logger.warning('Restart command recieved: system will restart in 15 seconds')
                 timerthread = Timer(15, reboot)
                 timerthread.start()
+            return {'command': 'rebooting'}
+        return {'error': 'unknown command'}
     except ValueError:
         logger.error('incorrect json message')
+        return {'error': 'incorrect json message'}
     except IndexError:
-        logger.error('bad valve number')
+        logger.error('bad Item')
+        return {'error': 'incorrect json message'}
 
 
 def reboot():
