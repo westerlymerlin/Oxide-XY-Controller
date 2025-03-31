@@ -121,7 +121,6 @@ class StepperClass:
             else:
                 steps += 1
                 self.moveprevious()
-            sleep(self.pulsewidth * 2)
         self.updateposition()
         self.stop()
 
@@ -155,10 +154,6 @@ class StepperClass:
                 if delta > 0:
                     if abs(target - self.position) < 10:
                         self.movenext(True)  # fine steps
-                        if self.position > target:
-                            self.moveprevious(True)
-                            self.stop()
-                            # return
                     else:
                         self.movenext()
                 else:
@@ -166,15 +161,10 @@ class StepperClass:
                         self.moveprevious(True)   # fine steps
                         if self.position < target:
                             self.movenext(True)
-                            self.stop()
-                            # return
                     else:
                         self.moveprevious()
                 difference = abs(target - self.position)
-                # print('difference %f' % difference )
-                if difference > 5:
-                    sleep(self.pulsewidth * 2)
-                else:
+                if difference < 10:
                     sleep(self.pulsewidth * 10)
         logger.info('%s Move to %s complete, position = %s', self.axis, target, self.position)
         self.moving = False
@@ -196,7 +186,7 @@ class StepperClass:
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 5)
         logger.info('Min limit reset, setting zero')
         self.position = 0
         while self.maxswitch == 1:
@@ -204,7 +194,7 @@ class StepperClass:
             sleep(self.pulsewidth)
         while self.maxswitch == 0:
             self.moveprevious()
-            sleep(self.pulsewidth)
+            sleep(self.pulsewidth * 5)
         logger.info('Max limit set to %s', self.position -10)
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
