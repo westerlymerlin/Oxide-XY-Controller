@@ -56,9 +56,9 @@ class StepperClass:
             self.maxswitch = GPIO.input(self.channelupperlimit)
             self.minswitch = GPIO.input(self.channellowerlimit)
             if self.minswitch == 0:
-                logger.info('Min limit switch %s found', self.axis)
+                logger.info('Min limit switch %s pressed', self.axis)
             if self.maxswitch == 0:
-                logger.info('Max limit switch %s found', self.axis)
+                logger.info('Max limit switch %s pressed', self.axis)
             sleep(0.5)
 
 
@@ -158,7 +158,7 @@ class StepperClass:
                         if self.position > target:
                             self.moveprevious(True)
                             self.stop()
-                            return
+                            # return
                     else:
                         self.movenext()
                 else:
@@ -167,7 +167,7 @@ class StepperClass:
                         if self.position < target:
                             self.movenext(True)
                             self.stop()
-                            return
+                            # return
                     else:
                         self.moveprevious()
                 difference = abs(target - self.position)
@@ -176,6 +176,7 @@ class StepperClass:
                     sleep(self.pulsewidth * 2)
                 else:
                     sleep(0.3)
+        logger.info('%s Move to %s complete, position = %s', self.axis, target, self.position)
         self.moving = False
 
     def output(self, channels):
@@ -191,7 +192,7 @@ class StepperClass:
         logger.info('Starting Calibrating %s', self.axis)
         while self.minswitch == 1:
             self.moveprevious()
-            #  sleep(self.pulsewidth * 2)
+            sleep(self.pulsewidth)
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
@@ -203,15 +204,16 @@ class StepperClass:
             # sleep(self.pulsewidth * 2)
         while self.maxswitch == 0:
             self.moveprevious()
-            sleep(self.pulsewidth * 2)
+            sleep(self.pulsewidth)
         logger.info('Max limit set to %s', self.position -10)
         self.upperlimit = self.position - 10
         settings[self.upperlimitsetting] = self.upperlimit
         self.updateposition()
         self.calibrating = False
-        centre = int(self.upperlimit + self.lowerlimit) / 2
+        centre = int(self.upperlimit + self.lowerlimit / 2)
         logger.info('Calibrating %s complete moving to centre %s', self.axis, centre)
         self.moveto(centre)
+        self.stop()
 
 def statusmessage():
     """Return the psotion status to the web page"""
