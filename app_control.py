@@ -18,6 +18,7 @@ def initialise():
                  'loglevel': 'INFO',
                  'gunicornpath': './logs/',
                  'cputemp': '/sys/class/thermal/thermal_zone0/temp',
+                 'stepper-pulse-width': 0.025,
                  'x-bb-gpio-pin': 16,
                  'x-b-gpio-pin': 13,
                  'x-aa-gpio-pin': 12,

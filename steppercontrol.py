@@ -39,7 +39,7 @@ class StepperClass:
         self.maxswitch = 0
         self.minswitch = 0
         self.sequence = 0
-        self.pulsewidth = 0.025
+        self.pulsewidth = settings['stepper-pulse-width']
         self.moving = False
         self.calibrating = False
         GPIO.setup([a, aa, b, bb], GPIO.OUT)
@@ -175,7 +175,7 @@ class StepperClass:
                 if difference > 5:
                     sleep(self.pulsewidth * 2)
                 else:
-                    sleep(0.3)
+                    sleep(self.pulsewidth * 10)
         logger.info('%s Move to %s complete, position = %s', self.axis, target, self.position)
         self.moving = False
 
@@ -196,12 +196,12 @@ class StepperClass:
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
-            sleep(self.pulsewidth * 2)
+            sleep(self.pulsewidth)
         logger.info('Min limit reset, setting zero')
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
-            # sleep(self.pulsewidth * 2)
+            sleep(self.pulsewidth)
         while self.maxswitch == 0:
             self.moveprevious()
             sleep(self.pulsewidth)
@@ -210,7 +210,7 @@ class StepperClass:
         settings[self.upperlimitsetting] = self.upperlimit
         self.updateposition()
         self.calibrating = False
-        centre = int(self.upperlimit + self.lowerlimit / 2)
+        centre = int((self.upperlimit - self.lowerlimit) / 2)
         logger.info('Calibrating %s complete moving to centre %s', self.axis, centre)
         self.moveto(centre)
         self.stop()
