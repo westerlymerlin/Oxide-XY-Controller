@@ -4,7 +4,7 @@ This is the main flask application - called by Gunicorn
 import subprocess
 from threading import enumerate as enumerate_threads
 from flask import Flask, render_template, jsonify, request
-from steppercontrol import statusmessage, parsecontrol, apistatus
+from steppercontrol import statusmessage, parsecontrol
 from app_control import VERSION, settings
 from logmanager import logger
 
@@ -58,8 +58,7 @@ def api():
             if request.headers['Api-Key'] == settings['api-key']:  # check for correct API key
                 item = request.json['item']
                 command = request.json['command']
-                parsecontrol(item, command)
-                return jsonify(apistatus()), 201
+                return jsonify(parsecontrol(item, command)), 201
             logger.warning('API: access attempt using an invalid token from %s', request.headers[''])
             return 'access token(s) unuthorised', 401
         logger.warning('API: access attempt without a token from  %s', request.headers['X-Forwarded-For'])
