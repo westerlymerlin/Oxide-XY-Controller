@@ -6,12 +6,12 @@ import random
 import json
 from datetime import datetime
 
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 def initialise():
     """Setup the settings structure with default values"""
     isettings = {'LastSave': '01/01/2000 00:00:01',
-                 'app-name': 'Oxide Valve Controler',
+                 'app-name': 'Oxide X-Y Stage Controler',
                  'api-key': 'change-me',
                  'logfilepath': './logs/xycontrol.log',
                  'logappname': 'XY-Control-Py',
