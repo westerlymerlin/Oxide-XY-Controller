@@ -183,7 +183,6 @@ class StepperClass:
         logger.info('Starting Calibrating %s', self.axis)
         while self.minswitch == 1:
             self.moveprevious()
-            sleep(self.pulsewidth)
         logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
@@ -192,7 +191,6 @@ class StepperClass:
         self.position = 0
         while self.maxswitch == 1:
             self.movenext()
-            sleep(self.pulsewidth)
         while self.maxswitch == 0:
             self.moveprevious()
             sleep(self.pulsewidth * 5)
@@ -202,9 +200,11 @@ class StepperClass:
         self.updateposition()
         self.calibrating = False
         centre = int((self.upperlimit - self.lowerlimit) / 2)
-        logger.info('Calibrating %s complete moving to centre %s', self.axis, centre)
+        logger.info('Calibrating %s complete moving to centre', self.axis)
         self.moveto(centre)
         self.stop()
+        self.updateposition()
+        logger.info('Calibrating %s complete, position = %s', self.axis, self.position)
 
 def statusmessage():
     """Return the psotion status to the web page"""
@@ -237,6 +237,8 @@ def parsecontrol(item, command):
     try:
         if item != 'getxystatus':
             logger.info('%s : %s ', item, command)
+        else:
+            return apistatus()
         if item == 'xmove':
             timerthread = Timer(0.1, lambda: stepperx.move(command))
             timerthread.name = 'xmove thread'
