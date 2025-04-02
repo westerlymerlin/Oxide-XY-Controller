@@ -218,7 +218,7 @@ def statusmessage():
     return statuslist
 
 def apistatus():
-    """Return the ststus as a json message for the api"""
+    """Return the status as a json message for the api"""
     statuslist = ({'xpos': stepperx.position, 'xmoving': stepperx.moving, 'ypos': steppery.position,
                    'ymoving': steppery.moving })
     return statuslist
@@ -236,7 +236,7 @@ def parsecontrol(item, command):
     """Parser that recieves messages from the API or web page posts and directs messages to the correct function"""
     try:
         if item != 'getxystatus':
-            logger.info('%s : %s ', item, command)
+            logger.info('Request recieved {%s : %s}', item, command)
         else:
             return apistatus()
         if item == 'xmove':
