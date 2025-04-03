@@ -6,7 +6,7 @@ import random
 import json
 from datetime import datetime
 
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 
 def initialise():
     """Setup the settings structure with default values"""
@@ -27,6 +27,7 @@ def initialise():
                  'x-max-gpio-pin': 17,
                  'x-min': 10,
                  'x-min-gpio-pin': 27,
+                 'x-moving-gpio-pin': 24,
                  'xposition': 500,
                  'y-a-gpio-pin': 19,
                  'y-aa-gpio-pin': 20,
@@ -36,6 +37,7 @@ def initialise():
                  'y-max-gpio-pin': 23,
                  'y-min': 10,
                  'y-min-gpio-pin': 18,
+                 'y-moving-gpio-pin': 25,
                  'yposition': 500
                  }
     return isettings
