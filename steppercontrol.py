@@ -12,7 +12,7 @@ from app_control import settings, writesettings
 
 class StepperClass:
     """Class to control a stepper motor"""
-    def __init__(self, direction, a, aa, b, bb, limmax, limmin):
+    def __init__(self, direction, a, aa, b, bb, limmax, limmin, moveled):
         self.axis = direction
         self.seq = [[1, 0, 1, 0],
                     [1, 0, 0, 0],
@@ -30,6 +30,7 @@ class StepperClass:
         self.sequenceindex = 0
         self.channelupperlimit = limmax
         self.channellowerlimit = limmin
+        self.channelmoveled = moveled
         self.positionsetting = '%sposition' % direction
         self.upperlimitsetting = '%s-max' % direction
         self.lowerlimitsetting = '%s-min' % direction
@@ -42,7 +43,7 @@ class StepperClass:
         self.pulsewidth = settings['stepper-pulse-width']
         self.moving = False
         self.calibrating = False
-        GPIO.setup([a, aa, b, bb], GPIO.OUT)
+        GPIO.setup([a, aa, b, bb, moveled], GPIO.OUT)
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
         readerthread = threading.Timer(1,self.readswitches)
@@ -59,6 +60,10 @@ class StepperClass:
                 logger.info('Min limit switch %s pressed', self.axis)
             if self.maxswitch == 0:
                 logger.info('Max limit switch %s pressed', self.axis)
+            if self.moving:
+                GPIO.output(self.channelmoveled, 1)
+            else:
+                GPIO.output(self.channelmoveled, 0)
             sleep(0.5)
 
 
@@ -305,7 +310,9 @@ logger.info("xy controller started")
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 stepperx = StepperClass('x', settings['x-a-gpio-pin'], settings['x-aa-gpio-pin'],settings['x-b-gpio-pin'],
-                        settings['x-bb-gpio-pin'], settings['x-max-gpio-pin'], settings['x-min-gpio-pin'])
+                        settings['x-bb-gpio-pin'], settings['x-max-gpio-pin'], settings['x-min-gpio-pin'],
+                        settings['x-moving-gpio-pin'])
 steppery = StepperClass('y', settings['y-a-gpio-pin'], settings['y-aa-gpio-pin'],settings['y-b-gpio-pin'],
-                        settings['y-bb-gpio-pin'], settings['y-max-gpio-pin'], settings['y-min-gpio-pin'])
+                        settings['y-bb-gpio-pin'], settings['y-max-gpio-pin'], settings['y-min-gpio-pin'],
+                        settings['y-moving-gpio-pin'])
 logger.info("xy controller ready")
