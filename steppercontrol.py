@@ -44,6 +44,7 @@ class StepperClass:
         self.moving = False
         self.calibrating = False
         GPIO.setup([a, aa, b, bb, moveled], GPIO.OUT)
+        self.moveled_pwm = GPIO.PWM(moveled, 2)
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
         readerthread = threading.Timer(1,self.readswitches)
@@ -61,9 +62,9 @@ class StepperClass:
             if self.maxswitch == 0:
                 logger.info('Max limit switch %s pressed', self.axis)
             if self.moving:
-                GPIO.output(self.channelmoveled, 1)
+                self.moveled_pwm.start(10)
             else:
-                GPIO.output(self.channelmoveled, 0)
+                self.moveled_pwm.stop()
             sleep(0.5)
 
 
