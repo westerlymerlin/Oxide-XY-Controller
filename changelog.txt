@@ -1,3 +1,4 @@
+1.0.4  Updated handling of limit switches to force a stop
 1.0.3  Moveing LED is flashing
 1.0.2  Added moving LED for front panel display
 1.0.1  Removed pauses in calibrate process and added a save position at end

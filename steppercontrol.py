@@ -44,27 +44,40 @@ class StepperClass:
         self.moving = False
         self.calibrating = False
         GPIO.setup([a, aa, b, bb, moveled], GPIO.OUT)
-        self.moveled_pwm = GPIO.PWM(moveled, 2)
+        self.moveled_pwm = GPIO.PWM(moveled, 1)
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
-        readerthread = threading.Timer(1,self.readswitches)
-        readerthread.name = '%s switches reader' %direction
+        readerthread = threading.Timer(1, self.read_switches)
+        readerthread.name = '%s limit switches reader' %direction
         readerthread.start()
 
 
-    def readswitches(self):
+    def read_switches(self):
         """Read the switch values"""
+        minswich = 1
+        maxswitch = 1
+        moving = 0
         while True:
             self.maxswitch = GPIO.input(self.channelupperlimit)
             self.minswitch = GPIO.input(self.channellowerlimit)
-            if self.minswitch == 0:
-                logger.info('Min limit switch %s pressed', self.axis)
-            if self.maxswitch == 0:
-                logger.info('Max limit switch %s pressed', self.axis)
-            if self.moving:
-                self.moveled_pwm.start(10)
-            else:
-                self.moveled_pwm.stop()
+            if minswich != self.minswitch:
+                minswich = self.minswitch
+                if minswich == 0:
+                    logger.info('Min limit switch %s reached', self.axis)
+                    if not self.calibrating:
+                        self.stop()
+            if maxswitch != self.maxswitch:
+                maxswitch = self.maxswitch
+                if maxswitch == 0:
+                    logger.info('Max limit switch %s reached', self.axis)
+                    if not self.calibrating:
+                        self.stop()
+            if moving != self.moving:
+                moving = self.moving
+                if self.moving:
+                    self.moveled_pwm.start(10)
+                else:
+                    self.moveled_pwm.stop()
             sleep(0.5)
 
 
@@ -155,7 +168,7 @@ class StepperClass:
             stepcounter = 0
             delta = target - self.position
             # print('delta = %s' % delta)
-            while self.position != target and seq == self.sequence:
+            while self.position != target and seq == self.sequence and self.moving:
                 stepcounter += 1
                 if delta > 0:
                     if abs(target - self.position) < 10:
@@ -187,6 +200,7 @@ class StepperClass:
         """Run a calibration routine to find the man and max limit switches and reset the position of the stage"""
         self.calibrating = True
         logger.info('Starting Calibrating %s', self.axis)
+        self.moving = True
         while self.minswitch == 1:
             self.moveprevious()
         logger.info('Min limit switch found')
