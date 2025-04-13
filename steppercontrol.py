@@ -203,7 +203,6 @@ class StepperClass:
         self.moving = True
         while self.minswitch == 1:
             self.moveprevious()
-        logger.info('Min limit switch found')
         while self.minswitch == 0:
             self.movenext()
             sleep(self.pulsewidth * 5)
