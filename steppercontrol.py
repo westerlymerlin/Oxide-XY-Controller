@@ -85,7 +85,7 @@ class StepperClass:
         """Return current sequence, used for debugging"""
         return self.seq[self.sequenceindex]
 
-    def movenext(self, fine=False):
+    def movenext(self):
         """Move +1 step"""
         stepincrement = 1
         if (self.position < self.upperlimit) or self.calibrating:
@@ -96,11 +96,8 @@ class StepperClass:
                 self.output(self.seq[self.sequenceindex])
                 self.position += stepincrement
                 sleep(self.pulsewidth)
-                if not fine:
-                    self.output([0, 0, 0, 0])
-                # print('Move %s' % stepincrement)
 
-    def moveprevious(self, fine=False):
+    def moveprevious(self):
         """Move -1 step"""
         stepincrement = -1
         if (self.position > self.lowerlimit) or self.calibrating:
@@ -111,9 +108,7 @@ class StepperClass:
                 self.output(self.seq[self.sequenceindex])
                 self.position += stepincrement
                 sleep(self.pulsewidth)
-                if not fine:
-                    self.output([0, 0, 0, 0])
-                # print('Move %s' % stepincrement)
+
 
     def updateposition(self):
         """write the position to the settings file"""
@@ -151,13 +146,13 @@ class StepperClass:
         while steps != 0 and self.moving:
             if steps > 0:
                 steps -= 1
-                self.movenext(True)
-                print(self.seq[self.sequenceindex])
+                self.movenext()
             else:
                 steps += 1
-                self.moveprevious(True)
-                print(self.seq[self.sequenceindex])
+                self.moveprevious()
             sleep(1)
+        self.stop()
+        self.moving = False
 
     def moveto(self, target):
         """Move the motor to a specific target value on the ADC"""
@@ -171,17 +166,9 @@ class StepperClass:
             while self.position != target and seq == self.sequence and self.moving:
                 stepcounter += 1
                 if delta > 0:
-                    if abs(target - self.position) < 10:
-                        self.movenext(True)  # fine steps
-                    else:
-                        self.movenext()
+                    self.movenext()
                 else:
-                    if abs(target - self.position) < 10:
-                        self.moveprevious(True)   # fine steps
-                        if self.position < target:
-                            self.movenext(True)
-                    else:
-                        self.moveprevious()
+                    self.moveprevious()
                 difference = abs(target - self.position)
                 if difference < 10:
                     sleep(self.pulsewidth * 10)
