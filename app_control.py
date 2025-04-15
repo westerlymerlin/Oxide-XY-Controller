@@ -18,7 +18,7 @@ def initialise():
                  'logappname': 'XY-Control-Py',
                  'logfilepath': './logs/xycontrol.log',
                  'loglevel': 'INFO',
-                 'stepper-pulse-width': 0.01,
+                 'stepper-pulse-width': 0.02,
                  'x-a-gpio-pin': 6,
                  'x-aa-gpio-pin': 12,
                  'x-b-gpio-pin': 13,
