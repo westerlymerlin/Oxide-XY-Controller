@@ -200,7 +200,7 @@ the motor status accordingly when the target is reached or the sequence changes.
 def output(channels)
 ```
 
-Output the value to thE coils on the stepper
+Output the value to the coils on the stepper
 
 <a id="steppercontrol.StepperClass.calibrate"></a>
 
