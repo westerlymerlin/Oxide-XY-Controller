@@ -1,5 +1,5 @@
 """
-This is the main flask application - called by Gunicorn
+This is the main flask applicaton, on the Raspberry Pi it runs on Gunicorn.
 """
 import subprocess
 from threading import enumerate as enumerate_threads
@@ -21,7 +21,7 @@ def read_log_from_file(file_path):
 
 
 def read_cpu_temperature():
-    """Read the CPU temperature"""
+    """Read the CPU temperature and teturns in in Celcius"""
     with open(settings['cputemp'], 'r', encoding='utf-8') as f:
         log = f.readline()
     return round(float(log) / 1000, 1)
@@ -42,7 +42,7 @@ def index():
 
 @app.route('/statusdata', methods=['GET'])
 def statusdata():
-    """Status data read by javascript on default website"""
+    """Status data read by javascript on default website so the page shows near live values"""
     ctrldata = statusmessage()
     ctrldata['cputemperature'] = read_cpu_temperature()
     return jsonify(ctrldata), 201
@@ -50,7 +50,8 @@ def statusdata():
 
 @app.route('/api', methods=['POST'])
 def api():
-    """API Endpoint for programatic access - needs request data to be posted in a json file"""
+    """API Endpoint for programatic access - needs request data to be posted in a json file. Contains a check for a
+    valid API key."""
     try:
         logger.debug('API headers: %s', request.headers)
         logger.debug('API request: %s', request.json)
@@ -70,7 +71,7 @@ def api():
 
 @app.route('/pylog')
 def showplogs():
-    """Show the Application log"""
+    """Show the Application log web page"""
     cputemperature = read_cpu_temperature()
     logs = read_log_from_file(settings['logfilepath'])
     return render_template('logs.html', rows=logs, log='Application log',
@@ -79,7 +80,7 @@ def showplogs():
 
 @app.route('/guaccesslog')
 def showgalogs():
-    """"Show the Gunicorn Access Log"""
+    """"Show the Gunicorn Access Log web page"""
     cputemperature = read_cpu_temperature()
     logs = read_log_from_file(settings['gunicornpath'] + 'gunicorn-access.log')
     return render_template('logs.html', rows=logs, log='Gunicorn Access Log',
@@ -88,7 +89,7 @@ def showgalogs():
 
 @app.route('/guerrorlog')
 def showgelogs():
-    """"Show the Gunicorn Errors Log"""
+    """"Show the Gunicorn Errors Log web page"""
     cputemperature = read_cpu_temperature()
     logs = read_log_from_file(settings['gunicornpath'] + 'gunicorn-error.log')
     return render_template('logs.html', rows=logs, log='Gunicorn Error Log',
@@ -97,7 +98,7 @@ def showgelogs():
 
 @app.route('/syslog')
 def showslogs():
-    """Show the system log"""
+    """Show the last 2000 lines from the system log on a web page"""
     cputemperature = read_cpu_temperature()
     log = subprocess.Popen('/bin/journalctl -n 2000', shell=True,
                            stdout=subprocess.PIPE).stdout.read().decode(encoding='utf-8')

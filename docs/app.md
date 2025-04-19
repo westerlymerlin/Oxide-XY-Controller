@@ -28,7 +28,7 @@
 
 # app
 
-This is the main flask application - called by Gunicorn
+This is the main flask applicaton, on the Raspberry Pi it runs on Gunicorn.
 
 <a id="app.subprocess"></a>
 
@@ -96,7 +96,7 @@ Read a log from a file and reverse the order of the lines so newest is at the to
 def read_cpu_temperature()
 ```
 
-Read the CPU temperature
+Read the CPU temperature and teturns in in Celcius
 
 <a id="app.threadlister"></a>
 
@@ -128,7 +128,7 @@ Main web status page
 def statusdata()
 ```
 
-Status data read by javascript on default website
+Status data read by javascript on default website so the page shows near live values
 
 <a id="app.api"></a>
 
@@ -139,7 +139,8 @@ Status data read by javascript on default website
 def api()
 ```
 
-API Endpoint for programatic access - needs request data to be posted in a json file
+API Endpoint for programatic access - needs request data to be posted in a json file. Contains a check for a
+valid API key.
 
 <a id="app.showplogs"></a>
 
@@ -150,7 +151,7 @@ API Endpoint for programatic access - needs request data to be posted in a json 
 def showplogs()
 ```
 
-Show the Application log
+Show the Application log web page
 
 <a id="app.showgalogs"></a>
 
@@ -161,7 +162,7 @@ Show the Application log
 def showgalogs()
 ```
 
-"Show the Gunicorn Access Log
+"Show the Gunicorn Access Log web page
 
 <a id="app.showgelogs"></a>
 
@@ -172,7 +173,7 @@ def showgalogs()
 def showgelogs()
 ```
 
-"Show the Gunicorn Errors Log
+"Show the Gunicorn Errors Log web page
 
 <a id="app.showslogs"></a>
 
@@ -183,5 +184,5 @@ def showgelogs()
 def showslogs()
 ```
 
-Show the system log
+Show the last 2000 lines from the system log on a web page
 

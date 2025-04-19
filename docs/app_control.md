@@ -43,7 +43,7 @@ has appeared it will creat from the defaults in the initialise function.
 def initialise()
 ```
 
-Setup the settings structure with default values
+Setup the settings dict structure with default values
 
 <a id="app_control.generate_api_key"></a>
 
@@ -53,7 +53,7 @@ Setup the settings structure with default values
 def generate_api_key(key_len)
 ```
 
-generate a new api key
+generate a new random api-key
 
 <a id="app_control.writesettings"></a>
 
@@ -63,7 +63,7 @@ generate a new api key
 def writesettings()
 ```
 
-Write settings to json file
+Write settings to a json file
 
 <a id="app_control.readsettings"></a>
 
@@ -83,7 +83,9 @@ Read the json file
 def loadsettings()
 ```
 
-Replace the default settings with thsoe from the json files
+Replace the default settings with thsoe from the json files, if a setting is not in the json file (e.g. it is a
+ new feature setitng) then retain the default value and write that to the json file. If the api-key is the default
+value then generate a new key and save it.
 
 <a id="app_control.settings"></a>
 
