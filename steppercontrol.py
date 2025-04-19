@@ -195,7 +195,7 @@ class StepperClass:
         self.moving = False
 
     def output(self, channels):
-        """Output the value to thE coils on the stepper"""
+        """Output the value to the coils on the stepper"""
         GPIO.output(self.channela, channels[0])
         GPIO.output(self.channelaa, channels[1])
         GPIO.output(self.channelb, channels[2])
