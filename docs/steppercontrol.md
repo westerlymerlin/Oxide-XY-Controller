@@ -11,7 +11,7 @@
   * [writesettings](#steppercontrol.writesettings)
   * [StepperClass](#steppercontrol.StepperClass)
     * [\_\_init\_\_](#steppercontrol.StepperClass.__init__)
-    * [read\_switches](#steppercontrol.StepperClass.read_switches)
+    * [\_\_read\_switches](#steppercontrol.StepperClass.__read_switches)
     * [current](#steppercontrol.StepperClass.current)
     * [movenext](#steppercontrol.StepperClass.movenext)
     * [moveprevious](#steppercontrol.StepperClass.moveprevious)
@@ -34,7 +34,9 @@
 
 # steppercontrol
 
-Main controller classes
+Main controller classes. Has a class to manage a single stepper so is called twice once for X and once for Y.
+It also contains an API Request parser that directs messages to the correct function and stepper based on the
+API request.
 
 <a id="steppercontrol.threading"></a>
 
@@ -76,7 +78,7 @@ Main controller classes
 class StepperClass()
 ```
 
-Class to control a stepper motor
+Class to control a stepper motor for a single axis
 
 <a id="steppercontrol.StepperClass.__init__"></a>
 
@@ -86,15 +88,17 @@ Class to control a stepper motor
 def __init__(direction, a, aa, b, bb, limmax, limmin, moveled)
 ```
 
-<a id="steppercontrol.StepperClass.read_switches"></a>
+<a id="steppercontrol.StepperClass.__read_switches"></a>
 
-#### read\_switches
+#### \_\_read\_switches
 
 ```python
-def read_switches()
+def __read_switches()
 ```
 
-Read the switch values
+A threaded method that continually reads the max and min limit switch status. If a limit is reached and
+the stepper is not calibrating, this function will stop the stepper. The function also sets a flashing LED on
+the front panel of the controller to show the stepper is moving
 
 <a id="steppercontrol.StepperClass.current"></a>
 
@@ -104,7 +108,7 @@ Read the switch values
 def current()
 ```
 
-Return current sequence, used for debugging
+Return current sequence, only used for debugging
 
 <a id="steppercontrol.StepperClass.movenext"></a>
 
@@ -114,7 +118,7 @@ Return current sequence, used for debugging
 def movenext()
 ```
 
-Move +1 step
+Move +1 step towards the maximum, if the maximum value has been reached it will not move further
 
 <a id="steppercontrol.StepperClass.moveprevious"></a>
 
@@ -124,7 +128,7 @@ Move +1 step
 def moveprevious()
 ```
 
-Move -1 step
+Move -1 step towards the minimum, if the minimum value has been reached it will not move further.
 
 <a id="steppercontrol.StepperClass.updateposition"></a>
 
@@ -134,7 +138,7 @@ Move -1 step
 def updateposition()
 ```
 
-write the position to the settings file
+write the stepper position to the settings file
 
 <a id="steppercontrol.StepperClass.stop"></a>
 
@@ -144,7 +148,8 @@ write the position to the settings file
 def stop()
 ```
 
-Stop moving
+Stop the stepper motor and set the coils to 0, also update the position of the stepper and write to
+the settings file
 
 <a id="steppercontrol.StepperClass.move"></a>
 
@@ -154,7 +159,7 @@ Stop moving
 def move(steps)
 ```
 
-Move **steps** at full speed
+Move **n steps** at full speed
 
 <a id="steppercontrol.StepperClass.moveslow"></a>
 
@@ -174,7 +179,18 @@ Move **steps** slowly
 def moveto(target)
 ```
 
-Move the motor to a specific target value on the ADC
+Moves the axis to the specified target position within its limits.
+
+This method initiates the movement process for the axis motor to reach the
+desired target position. The movement continues as long as the motor is in
+motion and has not been interrupted by external control. The method checks
+if the target position is within the specified range of lower and upper limits
+and adjusts the motor position incrementally. It stops the motion and updates
+the motor status accordingly when the target is reached or the sequence changes.
+
+:param target: Desired position to move the axis to.
+:type target: int or float
+:return: None
 
 <a id="steppercontrol.StepperClass.output"></a>
 
@@ -194,7 +210,13 @@ Output the value to thE coils on the stepper
 def calibrate()
 ```
 
-Run a calibration routine to find the man and max limit switches and reset the position of the stage
+Run a calibration routine to find the man and max limit switches and reset the position of the stage. The
+routine will move the stepper backward as far as the minimum switch is triggered, it will then slowly move the
+stepper forward until the switch is just released. This position is then recorded as zero. The stepper will
+then be moved forward unti the maximum limit is triggeed, then move backward until the switch is released,
+this position (- 10 steps) is stored as the maximum value. The routine then calculates the centre position and
+moves the stepper to that position. When calibrating the read() method will not stop the motor when a limit
+switch is triggered
 
 <a id="steppercontrol.statusmessage"></a>
 
@@ -204,7 +226,7 @@ Run a calibration routine to find the man and max limit switches and reset the p
 def statusmessage()
 ```
 
-Return the psotion status to the web page
+Return the psotion and stepper status in a format that can be read by the web page
 
 <a id="steppercontrol.apistatus"></a>
 
@@ -224,7 +246,7 @@ Return the status as a json message for the api
 def updatesetting(newsetting)
 ```
 
-Update the settings with the new values
+Update the settings variable and file with the new values from an api call
 
 <a id="steppercontrol.parsecontrol"></a>
 
@@ -234,7 +256,17 @@ Update the settings with the new values
 def parsecontrol(item, command)
 ```
 
-Parser that recieves messages from the API or web page posts and directs messages to the correct function
+Parser that recieves messages from the API or web page posts and directs messages to the correct function:
+Valid messages are:
+getxystatus: returns the current position of the steppers
+(axis)move: moves the stepper axis by the number of steps specified
+(axix)moveto: moves the stepper axis to the position specified
+(axis)calibrate: calibrates the stepper axis
+calibrate-all: calibrates both axes
+output: sets the coils on the stepper to the value specified (used foir testing ta stepper motor
+getsettings: returns the current settings in a json format
+updatesetting: updates the settings file with the new values specified in a json object
+restart: restarts the raspberry pi
 
 <a id="steppercontrol.reboot"></a>
 

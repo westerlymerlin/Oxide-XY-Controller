@@ -1,5 +1,7 @@
 """
-Main controller classes
+Main controller classes. Has a class to manage a single stepper so is called twice once for X and once for Y.
+It also contains an API Request parser that directs messages to the correct function and stepper based on the
+API request.
 """
 import threading
 from time import sleep
@@ -11,7 +13,7 @@ from app_control import settings, writesettings
 
 
 class StepperClass:
-    """Class to control a stepper motor"""
+    """Class to control a stepper motor for a single axis"""
     def __init__(self, direction, a, aa, b, bb, limmax, limmin, moveled):
         self.axis = direction
         self.seq = [[1, 0, 1, 0],
@@ -47,13 +49,15 @@ class StepperClass:
         self.moveled_pwm = GPIO.PWM(moveled, 1)
         GPIO.setup(limmax, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Max limit switch
         GPIO.setup(limmin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Min Limit Switch
-        readerthread = threading.Timer(1, self.read_switches)
+        readerthread = threading.Timer(1, self.__read_switches)
         readerthread.name = '%s limit switches reader' %direction
         readerthread.start()
 
 
-    def read_switches(self):
-        """Read the switch values"""
+    def __read_switches(self):
+        """A threaded method that continually reads the max and min limit switch status. If a limit is reached and
+        the stepper is not calibrating, this function will stop the stepper. The function also sets a flashing LED on
+        the front panel of the controller to show the stepper is moving"""
         minswich = 1
         maxswitch = 1
         moving = 0
@@ -82,11 +86,11 @@ class StepperClass:
 
 
     def current(self):
-        """Return current sequence, used for debugging"""
+        """Return current sequence, only used for debugging"""
         return self.seq[self.sequenceindex]
 
     def movenext(self):
-        """Move +1 step"""
+        """Move +1 step towards the maximum, if the maximum value has been reached it will not move further"""
         stepincrement = 1
         if (self.position < self.upperlimit) or self.calibrating:
             if self.maxswitch == 1 or self.calibrating:
@@ -98,7 +102,7 @@ class StepperClass:
                 sleep(self.pulsewidth)
 
     def moveprevious(self):
-        """Move -1 step"""
+        """Move -1 step towards the minimum, if the minimum value has been reached it will not move further."""
         stepincrement = -1
         if (self.position > self.lowerlimit) or self.calibrating:
             if self.minswitch == 1 or self.calibrating:
@@ -111,19 +115,20 @@ class StepperClass:
 
 
     def updateposition(self):
-        """write the position to the settings file"""
+        """write the stepper position to the settings file"""
         settings[self.positionsetting] = self.position
         writesettings()
 
     def stop(self):
-        """Stop moving"""
+        """Stop the stepper motor and set the coils to 0, also update the position of the stepper and write to
+        the settings file"""
         self.moving = False
         self.sequence = self.sequence + 1
         logger.info('%s stepper stopped, position = %s', self.axis, self.position)
         self.output([0, 0, 0, 0])
 
     def move(self, steps):
-        """Move **steps** at full speed"""
+        """Move **n steps** at full speed"""
         self.sequence = self.sequence + 1
         self.moving = True
         if steps == 0:
@@ -155,7 +160,20 @@ class StepperClass:
         self.moving = False
 
     def moveto(self, target):
-        """Move the motor to a specific target value on the ADC"""
+        """
+        Moves the axis to the specified target position within its limits.
+
+        This method initiates the movement process for the axis motor to reach the
+        desired target position. The movement continues as long as the motor is in
+        motion and has not been interrupted by external control. The method checks
+        if the target position is within the specified range of lower and upper limits
+        and adjusts the motor position incrementally. It stops the motion and updates
+        the motor status accordingly when the target is reached or the sequence changes.
+
+        :param target: Desired position to move the axis to.
+        :type target: int or float
+        :return: None
+        """
         self.moving = True
         self.sequence = self.sequence + 1
         seq = self.sequence
@@ -184,7 +202,13 @@ class StepperClass:
         GPIO.output(self.channelbb, channels[3])
 
     def calibrate(self):
-        """Run a calibration routine to find the man and max limit switches and reset the position of the stage"""
+        """Run a calibration routine to find the man and max limit switches and reset the position of the stage. The
+        routine will move the stepper backward as far as the minimum switch is triggered, it will then slowly move the
+        stepper forward until the switch is just released. This position is then recorded as zero. The stepper will
+        then be moved forward unti the maximum limit is triggeed, then move backward until the switch is released,
+        this position (- 10 steps) is stored as the maximum value. The routine then calculates the centre position and
+        moves the stepper to that position. When calibrating the read() method will not stop the motor when a limit
+        switch is triggered"""
         self.calibrating = True
         logger.info('Starting Calibrating %s', self.axis)
         self.moving = True
@@ -213,7 +237,7 @@ class StepperClass:
         logger.info('Calibrating %s complete, position = %s', self.axis, self.position)
 
 def statusmessage():
-    """Return the psotion status to the web page"""
+    """Return the psotion and stepper status in a format that can be read by the web page"""
     statuslist = ({'xpos': stepperx.position, 'ypos': steppery.position, 'xminswitch': stepperx.minswitch,
                    'xmaxswitch': stepperx.maxswitch, 'yminswitch': steppery.minswitch,
                    'ymaxswitch': steppery.maxswitch, 'stepperxa': GPIO.input(stepperx.channela),
@@ -231,7 +255,7 @@ def apistatus():
 
 
 def updatesetting(newsetting): # must be a dict object
-    """Update the settings with the new values"""
+    """Update the settings variable and file with the new values from an api call"""
     if isinstance(newsetting, dict):
         for item in newsetting.keys():
             settings[item] = newsetting[item]
@@ -239,7 +263,18 @@ def updatesetting(newsetting): # must be a dict object
 
 
 def parsecontrol(item, command):
-    """Parser that recieves messages from the API or web page posts and directs messages to the correct function"""
+    """Parser that recieves messages from the API or web page posts and directs messages to the correct function:
+    Valid messages are:
+    getxystatus: returns the current position of the steppers
+    (axis)move: moves the stepper axis by the number of steps specified
+    (axix)moveto: moves the stepper axis to the position specified
+    (axis)calibrate: calibrates the stepper axis
+    calibrate-all: calibrates both axes
+    output: sets the coils on the stepper to the value specified (used foir testing ta stepper motor
+    getsettings: returns the current settings in a json format
+    updatesetting: updates the settings file with the new values specified in a json object
+    restart: restarts the raspberry pi
+    """
     try:
         if item != 'getxystatus':
             logger.info('Request recieved {%s : %s}', item, command)
@@ -271,6 +306,15 @@ def parsecontrol(item, command):
             timerthread.start()
             return apistatus()
         if item == 'ycalibrate':
+            timerthread = Timer(0.1, steppery.calibrate)
+            timerthread.name = 'y calibrating thread'
+            timerthread.start()
+            return apistatus()
+        if item == 'calibrate-all':
+            logger.info('Calibrating all axis')
+            timerthread = Timer(0.1, steppery.calibrate)
+            timerthread.name = 'y calibrating thread'
+            timerthread.start()
             timerthread = Timer(0.1, steppery.calibrate)
             timerthread.name = 'y calibrating thread'
             timerthread.start()

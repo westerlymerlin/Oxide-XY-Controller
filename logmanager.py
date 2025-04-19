@@ -1,6 +1,6 @@
 """
-logmanager, setus up application logging. use the **logger** property to
-write to the log.
+Sets up the application logging. if it does not exist it creates a logs folder and a log file.
+Log files are rotated at 1Mbyte intervals and the past 10 files are retained.
 """
 
 import os
