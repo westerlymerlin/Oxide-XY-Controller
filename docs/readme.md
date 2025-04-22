@@ -16,8 +16,35 @@ Settings module, reads the settings from a settings.json file. If it does not ex
 has appeared it will create from the defaults in the initialise function.
 
 [logmanager](./logmanager.md)  
-Sets up the application logging. if it does not exist it creates a logs folder and a log file.
-Log files are rotated at 1Mbyte intervals and the past 10 files are retained.
+Logging Configuration and Management
+
+This module provides centralized logging configuration and management for the application.
+Configures logging formats, handlers, and log file management to ensure consistent
+logging across all application components.
+
+Features:
+    - Standardized log formatting
+    - File-based logging with rotation
+    - Log level management
+    - Thread-safe logging operations
+
+Exports:
+    logger: Configured logger instance for use across the application
+
+Usage:
+    from logmanager import logger
+
+    logger.info('Operation completed successfully')
+    logger.warning('Resource threshold reached')
+    logger.error('Failed to complete operation')
+
+Log Format:
+    Timestamps, log levels, and contextual information are automatically included
+    in each log entry for effective debugging and monitoring.
+
+Log Files:
+    Logs are stored with automatic rotation to prevent excessive disk usage
+    while maintaining historical records.
 
 [steppercontrol](./steppercontrol.md)  
 Main controller classes. Has a class to manage a single stepper so is called twice once for X and once for Y.
