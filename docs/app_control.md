@@ -16,8 +16,25 @@
 
 # app\_control
 
-Settings module, reads the settings from a settings.json file. If it does not exist or a new setting
-has appeared it will create from the defaults in the initialise function.
+Application control and configuration management for the Raspberry Pi control system.
+
+This module manages core application configuration, settings, and version information
+for the Flask-based control system. It handles loading and maintaining application-wide
+settings that define crucial operational parameters.
+
+Attributes:
+    VERSION (str): The current version of the application
+    settings (dict): Application-wide configuration dictionary containing:
+        - app-name (str): Application identifier used in logging and display
+        - api-key (str): Authentication key for API access control
+        - cputemp (str): File path for CPU temperature readings
+        - logfilepath (str): Path to application log file
+        - gunicornpath (str): Base directory for Gunicorn log files
+
+Note:
+    This module is a central configuration point for the application and should
+    be imported by other modules that need access to global settings or version
+    information.
 
 <a id="app_control.random"></a>
 

@@ -1,7 +1,7 @@
 # UCL-Oxide-XY-Controller
 Python project to control an X-Y stage from a raspberry pi computer. 
 
-Functional description and setup instructions are available in the file: [readme.pdf](./readme.pdf)
+Functional description and setup instructions are available in the file: [manual.pdf](./manual.pdf)
 
 Python module documentation can be found in the folder: [docs](./docs/readme.md)
 

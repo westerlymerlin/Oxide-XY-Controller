@@ -28,7 +28,29 @@
 
 # app
 
-This is the main flask applicaton, on the Raspberry Pi it runs on Gunicorn.
+Flask web application for Raspberry Pi system monitoring and control.
+
+This module provides a web interface and API endpoints for monitoring and controlling
+a Raspberry Pi system. It includes features for:
+- System status monitoring (CPU temperature, running threads)
+- Log viewing (Application, Gunicorn, System logs)
+- RESTful API endpoints with authentication
+- Real-time status updates via JavaScript
+
+The application runs on Gunicorn when deployed on Raspberry Pi and includes
+various endpoints for both web interface and programmatic access.
+
+Routes:
+    / : Main status page
+    /statusdata : JSON endpoint for live status updates
+    /api : Protected API endpoint for system control
+    /pylog : Application log viewer
+    /guaccesslog : Gunicorn access log viewer
+    /guerrorlog : Gunicorn error log viewer
+    /syslog : System log viewer
+
+Authentication:
+    API endpoints require a valid API key passed in the 'Api-Key' header.
 
 <a id="app.subprocess"></a>
 

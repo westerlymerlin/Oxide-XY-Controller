@@ -1,7 +1,32 @@
 """
-Main controller classes. Has a class to manage a single stepper so is called twice once for X and once for Y.
-It also contains an API Request parser that directs messages to the correct function and stepper based on the
-API request.
+Stepper motor control interface for Raspberry Pi hardware control system.
+
+This module provides functionality to control and monitor stepper motors connected
+to the Raspberry Pi. It handles both status reporting and command parsing for
+motor control operations.
+
+Functions:
+    statusmessage() -> dict:
+        Returns the current status of all stepper motors in the system.
+        The status includes position, state, and other relevant motor parameters.
+        Returns:
+            dict: Current status of the stepper motors
+
+    parsecontrol(item: str, command: str) -> dict:
+        Parses and executes control commands for specified stepper motor.
+
+        Args:
+            item (str): The identifier of the stepper motor to control
+            command (str): The control command to execute
+
+        Returns:
+            dict: Result of the control operation including status and any error messages
+
+Note:
+    This module interfaces directly with hardware components and should be used
+    with appropriate driver board to prevent mechanical issues.
+
+
 """
 import threading
 from time import sleep
@@ -13,7 +38,63 @@ from app_control import settings, writesettings
 
 
 class StepperClass:
-    """Class to control a stepper motor for a single axis"""
+    """
+    Class to manage and control a stepper motor using GPIO and threading.
+
+    This class provides methods to move, stop, calibrate, and manage the position
+    of a stepper motor. It uses GPIO pins for hardware interaction and threading
+    for continuous monitoring of limit switches and movement control. The class
+    ensures safe operation by respecting hardware-defined movement limits and includes
+    calibration capabilities to define the valid range of motion. The settings
+    configuration is used for storing and updating operational parameters.
+
+    :ivar axis: The identifier or name of the stepper motor axis.
+    :type axis: str
+    :ivar seq: The step sequence used by the stepper motor to move.
+    :type seq: list[list[int]]
+    :ivar channela: GPIO pin controlling the first output channel of the stepper motor.
+    :type channela: int
+    :ivar channelaa: GPIO pin controlling the second output channel of the stepper motor.
+    :type channelaa: int
+    :ivar channelb: GPIO pin controlling the third output channel of the stepper motor.
+    :type channelb: int
+    :ivar channelbb: GPIO pin controlling the fourth output channel of the stepper motor.
+    :type channelbb: int
+    :ivar sequenceindex: Current index in the step sequence.
+    :type sequenceindex: int
+    :ivar channelupperlimit: GPIO pin for the maximum limit switch.
+    :type channelupperlimit: int
+    :ivar channellowerlimit: GPIO pin for the minimum limit switch.
+    :type channellowerlimit: int
+    :ivar channelmoveled: GPIO pin for the movement indicator LED.
+    :type channelmoveled: int
+    :ivar positionsetting: Name of the settings key for the stepper's position.
+    :type positionsetting: str
+    :ivar upperlimitsetting: Name of the settings key for the maximum limit value.
+    :type upperlimitsetting: str
+    :ivar lowerlimitsetting: Name of the settings key for the minimum limit value.
+    :type lowerlimitsetting: str
+    :ivar position: Current position of the stepper motor.
+    :type position: int
+    :ivar upperlimit: Maximum position value allowed for the stepper motor.
+    :type upperlimit: int
+    :ivar lowerlimit: Minimum position value allowed for the stepper motor.
+    :type lowerlimit: int
+    :ivar maxswitch: State of the max limit switch.
+    :type maxswitch: int
+    :ivar minswitch: State of the min limit switch.
+    :type minswitch: int
+    :ivar sequence: Counter for movement sequences performed.
+    :type sequence: int
+    :ivar pulsewidth: Time delay between step pulses, controls stepper speed.
+    :type pulsewidth: float
+    :ivar moving: Status flag to indicate whether the stepper is currently moving.
+    :type moving: bool
+    :ivar calibrating: Status flag to indicate whether the stepper is in calibration mode.
+    :type calibrating: bool
+    :ivar moveled_pwm: PWM controller for the movement indicator LED.
+    :type moveled_pwm: GPIO.PWM
+    """
     def __init__(self, direction, a, aa, b, bb, limmax, limmin, moveled):
         self.axis = direction
         self.seq = [[1, 0, 1, 0],
@@ -55,9 +136,15 @@ class StepperClass:
 
 
     def __read_switches(self):
-        """A threaded method that continually reads the max and min limit switch status. If a limit is reached and
-        the stepper is not calibrating, this function will stop the stepper. The function also sets a flashing LED on
-        the front panel of the controller to show the stepper is moving"""
+        """
+        Continuously monitors the state of the minimum and maximum limit switches and updates
+        the corresponding attributes. Reacts to changes in the limit switch states by logging
+        events and optionally stopping movement. Also manages the LED indicating movement
+        activity.
+
+        :raises RuntimeError: If the GPIO library encounters an error while reading input values
+            or controlling PWM components.
+        """
         minswich = 1
         maxswitch = 1
         moving = 0
