@@ -32,7 +32,7 @@ The api is managed by sending the following json messages in a [POST] to  server
 | `{"calibrate-all", True}` | Calibrate the both axes                                         |
 | `{"getsettings", True}` | Return the current running settings values                      |
 | `{"updatesetting", {"item": "setting name" : "value": "new value"}}` | Update the settings for the "setting name" with the "new value" |
-| `{'restart', 'pi'}` | Restart the raspberry pi after a 15 second delay               |
+
 
 
 &nbsp;   
