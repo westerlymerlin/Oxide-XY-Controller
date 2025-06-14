@@ -1,4 +1,4 @@
-# UCL-Oxide-XY-Controller
+# PyMS  XY Controller Service
 A Flask-based control system for managing an X-Y stage using a Raspberry Pi. This application provides precise control over two-axis movement through a web interface and API endpoints.
 
 ## Features
@@ -33,4 +33,34 @@ The api is managed by sending the following json messages in a [POST] to  server
 | `{"getsettings", True}` | Return the current running settings values |
 | `{"updatesetting", {"item": "setting name" : "value": "new value"}}` | Update the settings for the "setting name" with the "new value" |
 | `{'restart', 'pi'}` | Restart the raspberry pi after a 15 secodn delay |
+
+
+&nbsp;   
+&nbsp;    
+&nbsp;  
+&nbsp;   
+&nbsp;   
+&nbsp;   
+--------------
+
+#### Copyright (C) 2025 Gary Twinn
+
+This program is free software: you can redistribute it and/or modify  
+it under the terms of the GNU General Public License as published by  
+the Free Software Foundation, either version 3 of the License, or  
+(at your option) any later version.  
+
+This program is distributed in the hope that it will be useful,  
+but WITHOUT ANY WARRANTY; without even the implied warranty of  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
+GNU General Public License for more details.  
+
+You should have received a copy of the GNU General Public License  
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+Author:  Gary Twinn  
+Repository:  [github.com/westerlymerlin](https://github)
+
+-------------
 
