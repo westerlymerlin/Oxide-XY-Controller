@@ -1,34 +1,4 @@
-# Contents for: steppercontrol
-
-* [steppercontrol](#steppercontrol)
-  * [threading](#steppercontrol.threading)
-  * [sleep](#steppercontrol.sleep)
-  * [os](#steppercontrol.os)
-  * [Timer](#steppercontrol.Timer)
-  * [GPIO](#steppercontrol.GPIO)
-  * [logger](#steppercontrol.logger)
-  * [settings](#steppercontrol.settings)
-  * [writesettings](#steppercontrol.writesettings)
-  * [StepperClass](#steppercontrol.StepperClass)
-    * [\_\_init\_\_](#steppercontrol.StepperClass.__init__)
-    * [\_\_read\_switches](#steppercontrol.StepperClass.__read_switches)
-    * [current](#steppercontrol.StepperClass.current)
-    * [movenext](#steppercontrol.StepperClass.movenext)
-    * [moveprevious](#steppercontrol.StepperClass.moveprevious)
-    * [updateposition](#steppercontrol.StepperClass.updateposition)
-    * [stop](#steppercontrol.StepperClass.stop)
-    * [move](#steppercontrol.StepperClass.move)
-    * [moveslow](#steppercontrol.StepperClass.moveslow)
-    * [moveto](#steppercontrol.StepperClass.moveto)
-    * [output](#steppercontrol.StepperClass.output)
-    * [calibrate](#steppercontrol.StepperClass.calibrate)
-  * [statusmessage](#steppercontrol.statusmessage)
-  * [apistatus](#steppercontrol.apistatus)
-  * [updatesetting](#steppercontrol.updatesetting)
-  * [parsecontrol](#steppercontrol.parsecontrol)
-  * [reboot](#steppercontrol.reboot)
-  * [stepperx](#steppercontrol.stepperx)
-  * [steppery](#steppercontrol.steppery)
+# None
 
 <a id="steppercontrol"></a>
 
